@@ -12,10 +12,9 @@ async function readYAML(filePath: string) {
 async function generateCode(yamlData: any) {
   const project = new Project();
 
-  // Example: Generate a TypeScript file for components
-  const componentsFile = project.createSourceFile('components.ts', {}, { overwrite: true });
-
+  // Generate components
   if (yamlData.components) {
+    const componentsFile = project.createSourceFile('components.ts', {}, { overwrite: true });
     for (const [componentName, componentData] of Object.entries(yamlData.components)) {
       componentsFile.addInterface({
         name: `${componentName}Props`,
@@ -32,6 +31,57 @@ async function generateCode(yamlData: any) {
         statements: `return <div>{/* TODO: Implement ${componentName} */}</div>;`,
       });
     }
+  }
+
+  // Generate pages
+  if (yamlData.pages) {
+    const pagesFile = project.createSourceFile('pages.ts', {}, { overwrite: true });
+    for (const [pageName, pageData] of Object.entries(yamlData.pages)) {
+      pagesFile.addFunction({
+        name: pageName,
+        returnType: 'JSX.Element',
+        statements: `return <div>{/* TODO: Implement ${pageName} */}</div>;`,
+      });
+    }
+  }
+
+  // Generate API routes
+  if (yamlData.apiRoutes) {
+    const apiFile = project.createSourceFile('api.ts', {}, { overwrite: true });
+    for (const [routeName, routeData] of Object.entries(yamlData.apiRoutes)) {
+      apiFile.addFunction({
+        name: routeName,
+        parameters: [{ name: 'req', type: 'Request' }, { name: 'res', type: 'Response' }],
+        returnType: 'void',
+        statements: `// TODO: Implement ${routeName}`,
+      });
+    }
+  }
+
+  // Generate state management
+  if (yamlData.state) {
+    const stateFile = project.createSourceFile('state.ts', {}, { overwrite: true });
+    stateFile.addVariableStatement({
+      declarationKind: StructureKind.VariableStatement,
+      declarations: [{
+        name: 'initialState',
+        initializer: JSON.stringify(yamlData.state, null, 2),
+      }],
+    });
+
+    stateFile.addFunction({
+      name: 'reducer',
+      parameters: [
+        { name: 'state', type: 'typeof initialState', initializer: 'initialState' },
+        { name: 'action', type: '{ type: string; payload?: any }' },
+      ],
+      returnType: 'typeof initialState',
+      statements: `switch (action.type) {
+        // TODO: Add cases
+        default:
+          return state;
+      }`,
+    });
   }
 
   // Save the generated files
