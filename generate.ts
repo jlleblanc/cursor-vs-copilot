@@ -14,9 +14,15 @@ async function generateCode(yamlData: any) {
 
   // Generate components
   if (yamlData.components) {
-    const componentsFile = project.createSourceFile('components.ts', {}, { overwrite: true });
+    const componentsDir = project.createDirectory('components');
     for (const [componentName, componentData] of Object.entries(yamlData.components)) {
-      componentsFile.addInterface({
+      const componentFile = componentsDir.createSourceFile(`${componentName}.tsx`, {}, { overwrite: true });
+      componentFile.addImportDeclaration({
+        moduleSpecifier: 'react',
+        defaultImport: 'React',
+      });
+
+      componentFile.addInterface({
         name: `${componentName}Props`,
         properties: Object.entries(componentData.props).map(([propName, propType]) => ({
           name: propName,
@@ -24,7 +30,7 @@ async function generateCode(yamlData: any) {
         })),
       });
 
-      componentsFile.addFunction({
+      componentFile.addFunction({
         name: componentName,
         parameters: [{ name: 'props', type: `${componentName}Props` }],
         returnType: 'JSX.Element',
@@ -35,9 +41,15 @@ async function generateCode(yamlData: any) {
 
   // Generate pages
   if (yamlData.pages) {
-    const pagesFile = project.createSourceFile('pages.ts', {}, { overwrite: true });
+    const pagesDir = project.createDirectory('pages');
     for (const [pageName, pageData] of Object.entries(yamlData.pages)) {
-      pagesFile.addFunction({
+      const pageFile = pagesDir.createSourceFile(`${pageName}.tsx`, {}, { overwrite: true });
+      pageFile.addImportDeclaration({
+        moduleSpecifier: 'react',
+        defaultImport: 'React',
+      });
+
+      pageFile.addFunction({
         name: pageName,
         returnType: 'JSX.Element',
         statements: `return <div>{/* TODO: Implement ${pageName} */}</div>;`,
@@ -47,13 +59,23 @@ async function generateCode(yamlData: any) {
 
   // Generate API routes
   if (yamlData.apiRoutes) {
-    const apiFile = project.createSourceFile('api.ts', {}, { overwrite: true });
+    const apiDir = project.createDirectory('pages/api');
     for (const [routeName, routeData] of Object.entries(yamlData.apiRoutes)) {
+      const apiFile = apiDir.createSourceFile(`${routeName}.ts`, {}, { overwrite: true });
+      apiFile.addImportDeclaration({
+        moduleSpecifier: 'next',
+        namedImports: ['NextApiRequest', 'NextApiResponse'],
+      });
+
       apiFile.addFunction({
-        name: routeName,
-        parameters: [{ name: 'req', type: 'Request' }, { name: 'res', type: 'Response' }],
+        name: 'handler',
+        parameters: [
+          { name: 'req', type: 'NextApiRequest' },
+          { name: 'res', type: 'NextApiResponse' },
+        ],
         returnType: 'void',
-        statements: `// TODO: Implement ${routeName}`,
+        statements: `res.status(200).json({ message: 'TODO: Implement ${routeName}' });`,
+        isExported: true,
       });
     }
   }
