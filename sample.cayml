@@ -1,0 +1,12 @@
+pages:
+  index:
+    title: "Welcome to My Next.js Site"
+  about:
+    title: "About Us"
+
+components:
+  Header:
+  Footer:
+
+styles:
+  primaryColor: "#0070f3"
