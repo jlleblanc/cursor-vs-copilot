@@ -128,15 +128,58 @@ class CAYML {
   }
 
   private generateAPIRoutes(api: any): void {
-    // Generate API routes
+    for (const [routeName, routeConfig] of Object.entries(api)) {
+      const sourceFile = this.project.createSourceFile(
+        `src/api/${routeName}.ts`,
+        '',
+        { overwrite: true }
+      );
+
+      this.generateAPIRoute(sourceFile, routeName, routeConfig);
+    }
+  }
+
+  private generateAPIRoute(sourceFile: SourceFile, routeName: string, routeConfig: any): void {
+    sourceFile.addFunction({
+      name: 'handler',
+      isExported: true,
+      isAsync: true,
+      parameters: [
+        { name: 'req', type: 'Request' },
+        { name: 'res', type: 'Response' },
+      ],
+      statements: routeConfig.handler,
+    });
   }
 
   private generateState(state: any): void {
-    // Generate state management code
+    const sourceFile = this.project.createSourceFile(
+      'src/state/index.ts',
+      '',
+      { overwrite: true }
+    );
+
+    sourceFile.addVariableStatement({
+      declarationKind: SyntaxKind.Const,
+      declarations: [{
+        name: 'initialState',
+        initializer: writer => writer.write(JSON.stringify(state.initialState, null, 2)),
+      }],
+      isExported: true,
+    });
+
+    // Add more state management code based on your chosen state management library
   }
 
   private generateStyles(styles: any): void {
-    // Generate styling code or configuration
+    // Generate a CSS-in-JS file or a CSS file based on your styling approach
+    const sourceFile = this.project.createSourceFile(
+      'src/styles/index.ts',
+      '',
+      { overwrite: true }
+    );
+
+    // Add style definitions based on the CAYML configuration
   }
 }
 
