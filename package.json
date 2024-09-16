@@ -4,5 +4,8 @@
     "js-yaml": "^4.1.0",
     "ts-morph": "^23.0.0",
     "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.5"
   }
 }

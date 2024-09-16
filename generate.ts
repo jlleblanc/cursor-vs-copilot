@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import * as yaml from 'js-yaml';
-import { Project, StructureKind } from 'ts-morph';
+import { Project, VariableDeclarationKind } from 'ts-morph';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
@@ -17,7 +17,7 @@ async function generateCode(yamlData: any) {
   // Generate components
   if (yamlData.components) {
     const componentsDir = project.createDirectory('components');
-    for (const [componentName, componentData] of Object.entries(yamlData.components)) {
+    for (const [componentName, componentData] of Object.entries(yamlData.components) as [string, Record<string, unknown>][]) {
       const componentFile = componentsDir.createSourceFile(`${componentName}.tsx`, {}, { overwrite: true });
       componentFile.addImportDeclaration({
         moduleSpecifier: 'react',
@@ -26,7 +26,7 @@ async function generateCode(yamlData: any) {
 
       componentFile.addInterface({
         name: `${componentName}Props`,
-        properties: Object.entries(componentData.props).map(([propName, propType]) => ({
+        properties: Object.entries(componentData.props as { [s: string]: unknown }).map(([propName, propType]) => ({
           name: propName,
           type: propType as string,
         })),
@@ -105,7 +105,7 @@ async function generateCode(yamlData: any) {
   if (yamlData.state) {
     const stateFile = project.createSourceFile('state.ts', {}, { overwrite: true });
     stateFile.addVariableStatement({
-      declarationKind: StructureKind.VariableStatement,
+      declarationKind: VariableDeclarationKind.Const,
       declarations: [{
         name: 'initialState',
         initializer: JSON.stringify(yamlData.state, null, 2),
