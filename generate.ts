@@ -1,6 +1,8 @@
 import * as fs from 'fs-extra';
 import * as yaml from 'js-yaml';
 import { Project, StructureKind } from 'ts-morph';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 
 // Function to read and parse the YAML file
 async function readYAML(filePath: string) {
@@ -34,7 +36,14 @@ async function generateCode(yamlData: any) {
         name: componentName,
         parameters: [{ name: 'props', type: `${componentName}Props` }],
         returnType: 'JSX.Element',
-        statements: `return <div>{/* TODO: Implement ${componentName} */}</div>;`,
+        statements: `return (
+          <div>
+            {/* TODO: Implement ${componentName} */}
+            {Object.keys(props).map(key => (
+              <div key={key}>{key}: {props[key]}</div>
+            ))}
+          </div>
+        );`,
       });
     }
   }
@@ -52,7 +61,12 @@ async function generateCode(yamlData: any) {
       pageFile.addFunction({
         name: pageName,
         returnType: 'JSX.Element',
-        statements: `return <div>{/* TODO: Implement ${pageName} */}</div>;`,
+        statements: `return (
+          <div>
+            {/* TODO: Implement ${pageName} */}
+            <h1>${pageName}</h1>
+          </div>
+        );`,
       });
     }
   }
@@ -74,7 +88,14 @@ async function generateCode(yamlData: any) {
           { name: 'res', type: 'NextApiResponse' },
         ],
         returnType: 'void',
-        statements: `res.status(200).json({ message: 'TODO: Implement ${routeName}' });`,
+        statements: `
+          // TODO: Implement ${routeName} logic
+          if (req.method === 'GET') {
+            res.status(200).json({ message: '${routeName} GET request success' });
+          } else {
+            res.status(405).json({ message: 'Method not allowed' });
+          }
+        `,
         isExported: true,
       });
     }
@@ -98,11 +119,13 @@ async function generateCode(yamlData: any) {
         { name: 'action', type: '{ type: string; payload?: any }' },
       ],
       returnType: 'typeof initialState',
-      statements: `switch (action.type) {
-        // TODO: Add cases
-        default:
-          return state;
-      }`,
+      statements: `
+        switch (action.type) {
+          // TODO: Add cases
+          default:
+            return state;
+        }
+      `,
     });
   }
 
@@ -112,7 +135,9 @@ async function generateCode(yamlData: any) {
 
 // Main function to orchestrate the generation process
 async function main() {
-  const yamlData = await readYAML('path/to/your/cayml.yaml');
+  const argv = yargs(hideBin(process.argv)).argv;
+  const yamlFilePath = argv.file || 'cayml.yml';
+  const yamlData = await readYAML(yamlFilePath);
   await generateCode(yamlData);
 }
 
