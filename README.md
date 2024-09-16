@@ -10,7 +10,7 @@ At first, I was just going to do one prompt, so I did Cursor first. Then I commi
 
 Although I have access to the `@workspace` feature in Copilot chat, I did not use it for the test since it is not yet available to everyone. I did use the Compose function in Cursor and noted which files I added into the context.
 
-If I really wanted to do more of a scientific test, I probably would have signed up for a separate GitHub account so I would have a "clean" Copilot account. But I decided to turn all of this into a test on a whim, so I didn't do that.0
+If I really wanted to do more of a scientific test, I probably would have signed up for a separate GitHub account so I would have a "clean" Copilot account. But I decided to turn all of this into a test on a whim, so I didn't do that.
 
 Copilot got closer to generating working code, although I had to manually click buttons to run commands and copy code. Cursor did more in the way of building out more of the project structure, but it never got around to either directly or indirectly defining the packages that would be needed to run the project.
 
